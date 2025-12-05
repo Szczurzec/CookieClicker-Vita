@@ -18,17 +18,23 @@ local transwhite = Color.new(255,255,255,150)
 local trans100white = Color.new(255,255,255,100)
 --//--//--//--//--//--
 
+--//--//Vars//--//--
+local firstClickDone = false
+--//--//--//--//--//--
+
 --//--//Const//--//--
+math.randomseed(os.time())
 CENTER_OF_COOKIE_X = 148
 CENTER_OF_COOKIE_Y = 273
 --//--//--//--//--//--
 menu = 0
 temp4grade = 0
-version = "Version          0.2"
+version = "Version          0.21"
 --//--//Tables//--//--
 Building = {}
 Button = {}
 Cookie = {}
+SongFunc = {}
 Cookie.shower = {}
 CookiePerSecond = {}
 Cursor = {}
@@ -254,6 +260,8 @@ function Button.touch()
 				Cookie.count = Cookie.count + Button[Button[i].."price"]
 				Cookie.total = Cookie.total + Button[Button[i].."price"]
 			end
+			local id = math.random(1, #ClickSfx)
+			Sound.play( ClickSfx[id], false )
 			Building.update()
 			Button.update()
 			CookiePerSecond.update()
@@ -326,12 +334,28 @@ function Cookie.show()
 	Graphics.drawRotateImage(CENTER_OF_COOKIE_X, CENTER_OF_COOKIE_Y, Texture["shine"], - Shine.rot)
 	Graphics.drawImageExtended(CENTER_OF_COOKIE_X, CENTER_OF_COOKIE_Y, Texture["cookie"], 0, 0, 256, 256, 0, 1+Cookie.formula,1+Cookie.formula)
 end
+function SongFunc.play(song, looped)
+    if song ~= nil then
+        for i, v in pairs(Songs) do
+            if v and Sound.isPlaying(v) then
+                Sound.pause(v)
+            end
+        end
+        Sound.play(song, looped)
+    end
+end
 function Cookie.touch()
 	if Touch["x"]~=nil and Touch["Now"]=="N" and Touch["x"]>CENTER_OF_COOKIE_X-128 and Touch["x"]<CENTER_OF_COOKIE_X+128 and Touch["y"]>CENTER_OF_COOKIE_Y-128 and Touch["y"]<CENTER_OF_COOKIE_Y+128 then
 		Touch["Now"] = "Cookie"
 		Cookie.tmp = 1
 		Cookie.count = Cookie.count + 1 * Upgrade["CursorQuan"]
 		Cookie.total = Cookie.total + 1 * Upgrade["CursorQuan"]
+		local idb = math.random(1, #ClickbSfx)
+		Sound.play( ClickbSfx[idb], false )
+        if not firstClickDone then
+            firstClickDone = true
+            SongFunc.play(Songs.ClickSong, true)
+        end
 	end
 	if SpdOf.tmp==1 then
 		if Cookie.tmp==1 then
@@ -521,6 +545,7 @@ function Upgrade.touch()
 		if i <= 5 and Upgrade.mode == 1 then
 			if Touch["x"] ~= nil and Touch["Now"]=="N" and Touch["NowButtons"]~=1 and Touch["x"] > Button.x + 60 * (i - 1) and Touch["x"] <= Button.x + 60 * i and Touch["y"] > Upgrade.default - 124 and Touch["y"] < Upgrade.default - 64 and Upgrade.tmp == 0 and Upgrade[Upgrade.Now[i].."price"] <= Cookie.count then
 				Cookie.count = Cookie.count - Upgrade[Upgrade.Now[i].."price"]
+				Sound.play(Soundfx.Upgrade, false)
 				Upgrade.tmp = 1
 				Upgrade[Upgrade.Now[i].."a"] = 2
 				Upgrade.update()
@@ -530,6 +555,7 @@ function Upgrade.touch()
 			elseif Upgrade.mode==2 then
 			if Touch["x"] ~= nil and Touch["Now"]=="N" and Touch["NowButtons"]~=1 and Touch["x"] > Button.x + 60 * (i - 1)-300*(math.floor((i-0.1)/5)) and Touch["x"] <= Button.x + 60 * i-300*(math.floor((i-0.1)/5)) and Touch["y"] > Upgrade.default - 124+60*(math.floor((i+0.1)/5)-1) and Touch["y"] < Upgrade.default - 64+60*(math.floor((i+0.1)/5)) and Upgrade.tmp == 0 and Upgrade[Upgrade.Now[i].."price"] <= Cookie.count then
 				Cookie.count = Cookie.count - Upgrade[Upgrade.Now[i].."price"]
+				Sound.play(Soundfx.Upgrade, false)
 				Upgrade.tmp = 1
 				Upgrade[Upgrade.Now[i].."a"] = 2
 				Upgrade.update()
@@ -579,8 +605,11 @@ function Upgrade.cps()
 	end
 end
 function Game.save()
+
+	local clickFlag = firstClickDone and "1" or "0"
+
 	savefile = System.openFile("ux0:/data/ccsave.sav",FCREATE)
-	savestring = Cookie.count.."#"..Cookie.total.."#"..Button["Cursorcount"].."#"..Button["Grandmacount"].."#"..Button["Farmcount"].."#"..Button["Minecount"].."#"..Button["Factorycount"].."#"..Button["Bankcount"].."#"..Button["Templecount"].."#"..Button["WizardTowercount"].."#"..Button["Shipmentcount"].."#"..Button["AlchemyLabcount"].."#"..Button["Portalcount"].."#"..Button["TimeMachinecount"].."#"..Button["AntimatterCondensercount"].."#"..Button["Prismcount"].."#"
+	savestring = Cookie.count.."#"..Cookie.total.."#"..Button["Cursorcount"].."#"..Button["Grandmacount"].."#"..Button["Farmcount"].."#"..Button["Minecount"].."#"..Button["Factorycount"].."#"..Button["Bankcount"].."#"..Button["Templecount"].."#"..Button["WizardTowercount"].."#"..Button["Shipmentcount"].."#"..Button["AlchemyLabcount"].."#"..Button["Portalcount"].."#"..Button["TimeMachinecount"].."#"..Button["AntimatterCondensercount"].."#"..Button["Prismcount"].."#"..clickFlag.."#"
 	savestring = crypt(savestring,enc1)
 	savestringlen = string.len(savestring)
 	System.writeFile(savefile,savestring,savestringlen)
@@ -625,6 +654,7 @@ function Game.continue()
 		Button["TimeMachinecount"] = tonumber(savearray[14]) or 0
 		Button["AntimatterCondensercount"] = tonumber(savearray[15]) or 0
 		Button["Prismcount"] = tonumber(savearray[16]) or 0
+		firstClickDone = (tonumber(savearray[17]) or 0) == 1
 	end
 	if System.doesFileExist("ux0:/data/ccupsave.sav") then
 		savefile = System.openFile("ux0:/data/ccupsave.sav", FREAD)
@@ -762,6 +792,35 @@ function Cookie.shower.show()
 		Graphics.drawImage(0,Cookie.shower.y-544,Texture["cookieShower"..name])
 	end
 end
+Sound.init()
+Songs = {
+	ClickSong = Sound.open("app0:/assets/songs/click.ogg");
+	PreClickSong = Sound.open("app0:/assets/songs/preclick.ogg");
+	AscendSong = Sound.open("app0:/assets/songs/ascend.ogg");
+	GrandmaPocalypseSong = Sound.open("app0:/assets/songs/grandmapocalypse.ogg")
+}
+Soundfx = {
+	Upgrade = Sound.open("app0:/assets/sounds/upgrade.ogg");
+}
+ClickbSfx = {
+	[1] = Sound.open("app0:/assets/sounds/clickb1.ogg");
+	[2] = Sound.open("app0:/assets/sounds/clickb2.ogg");
+	[3] = Sound.open("app0:/assets/sounds/clickb3.ogg");
+	[4] = Sound.open("app0:/assets/sounds/clickb4.ogg");
+	[5] = Sound.open("app0:/assets/sounds/clickb5.ogg");
+	[6] = Sound.open("app0:/assets/sounds/clickb6.ogg");
+	[7] = Sound.open("app0:/assets/sounds/clickb7.ogg");
+}
+ClickSfx = {
+	[1] = Sound.open("app0:/assets/sounds/click1.ogg");
+	[2] = Sound.open("app0:/assets/sounds/click2.ogg");
+	[3] = Sound.open("app0:/assets/sounds/click3.ogg");
+	[4] = Sound.open("app0:/assets/sounds/click4.ogg");
+	[5] = Sound.open("app0:/assets/sounds/click5.ogg");
+	[6] = Sound.open("app0:/assets/sounds/click6.ogg");
+	[7] = Sound.open("app0:/assets/sounds/click7.ogg");
+}
+
 Texture.load("background", "background.png")
 Texture.load("cookie", "cookie.png")
 Texture.load("cursor", "cursor.png")
@@ -866,6 +925,11 @@ end
 Upgrade.update()
 Upgrade.cps()
 CookiePerSecond.update()
+if firstClickDone then
+	SongFunc.play(Songs.ClickSong, true)
+else
+	SongFunc.play(Songs.PreClickSong, true)
+end
 while true do
 	SpdOf.init()
 	pad = Controls.read()
