@@ -1,8 +1,8 @@
 ![](/logo.png)
 # CookieClicker Vita
 It's Cookie Clicker clone made on LUA for PlayStation Vita<br>
-![GitHub All Releases](https://img.shields.io/github/downloads/Creckeryop/CookieClicker-Vita/total?style=flat-square)
-![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/Creckeryop/CookieClicker-Vita?include_prereleases&style=flat-square)
+![GitHub All Releases](https://img.shields.io/github/downloads/Szczurzec/CookieClicker-Vita/total?style=flat-square)
+![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/Szczurzec/CookieClicker-Vita?include_prereleases&style=flat-square)
 ![](/screenshot.jpg)
 ## Features
 * Long Numbers (thanks to lpp-vita)
@@ -24,3 +24,4 @@ It's Cookie Clicker clone made on LUA for PlayStation Vita<br>
 ## Credits
 * [Rinnegatamante](https://github.com/Rinnegatamante/) - [lpp-vita](https://github.com/Rinnegatamante/lpp-vita)
 * [xerpi](https://github.com/xerpi/) - [libvita2d](https://github.com/xerpi/libvita2d)
+* [Creckeryop](https://github.com/Creckeryop) - [CookieClicker Vita](https://github.com/Creckeryop/CookieClicker-Vita)
